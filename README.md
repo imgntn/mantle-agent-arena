@@ -135,4 +135,5 @@ Files: `agent/receipts.py`, `agent/judge.py` (`judge_with_trace`), `agent/__main
 3. ✅ `docs/receipts.json` / `docs/dogfood.json` refreshed from `agent/receipts/` so the static page shows the real 6-agent dogfood result.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+
+All rights reserved for now. This project will be released under an open-source license (MIT) once it is accepted into the Turing Test Hackathon — kept proprietary until then.

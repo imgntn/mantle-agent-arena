@@ -32,6 +32,7 @@ W, H = 1280, 720
 PAD = 0.5            # seconds of silence/visual held after each narration line
 MUSIC_VOL = 0.07    # background bed level under the voice (kept well below the VO)
 SFX_VOL = 0.4       # transition whoosh level
+OVERLAP = 0.5       # crossfade (dissolve) duration between segments
 # Mantlescan sits behind a Cloudflare human-check that headless/headful capture can't pass
 # reliably, so the explorer/tx segments always use the rendered (real-data) placeholder cards.
 # Flip to False once a reliable Mantlescan capture exists in raw/ to prefer the live page.
@@ -155,12 +156,11 @@ def _card_html(inner):
 def _explorer_card_html():
     fns = CFG.get("functions", [])
     rows = "".join(f"<div class='item'><span class='kw'>{f}</span></div>" for f in fns)
-    lic = CFG.get("license", "MIT")
     return _card_html(
         f"<div class='bar'><span class='dot'></span> Mantle Sepolia Testnet · <b>sepolia.mantlescan.xyz</b></div>"
         f"<div class='panel'><h2>{CFG['contract_label']}<span class='ok'>&#10003; Contract Source Code Verified</span></h2>"
         f"<div class='addr'>{CFG['contract']}</div>"
-        f"<div class='meta'>Compiler v0.8.24 &nbsp;·&nbsp; Optimizer enabled &nbsp;·&nbsp; License {lic} &nbsp;·&nbsp; Chain ID 5003</div>"
+        f"<div class='meta'>Compiler v0.8.24 &nbsp;·&nbsp; Optimizer enabled &nbsp;·&nbsp; Chain ID 5003</div>"
         f"<div class='grid'>{rows}</div>"
         f"<div class='foot'>sepolia.mantlescan.xyz/address/{CFG['contract']}#code</div></div>")
 
@@ -229,7 +229,22 @@ def _png_clip(png, out, secs):
 
 def _webm_clip(webm, out, secs):
     _run(["ffmpeg", "-y", "-loglevel", "error", "-stream_loop", "-1", "-i", str(webm), "-t", f"{secs:.2f}",
-          "-r", "30", "-vf", VF, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", str(out)])
+          "-r", "30", "-vf", VF + ",format=yuv420p,settb=AVTB", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", str(out)])
+
+
+def _kenburns_clip(png, out, secs, zoom_in=True):
+    """Slow Ken Burns zoom on a static card/slate so it never feels dead-static.
+    Pre-scaled large to keep the zoom smooth (avoids zoompan integer jitter)."""
+    frames = max(2, int(round(secs * 30)))
+    if zoom_in:
+        z = "min(1.0+0.0010*on,1.16)"
+    else:
+        z = "max(1.16-0.0010*on,1.0)"
+    vf = (f"scale=2560:1440,zoompan=z='{z}':d={frames}:"
+          f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps=30,"
+          f"setsar=1,format=yuv420p,settb=AVTB")
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", str(png), "-t", f"{secs:.2f}",
+          "-r", "30", "-vf", vf, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-an", str(out)])
 
 
 def _resolve_visual(seg_id):
@@ -317,58 +332,93 @@ def assemble():
     TMP.mkdir(parents=True, exist_ok=True)
     FINAL.mkdir(parents=True, exist_ok=True)
     items = CFG["narration"]
-    vlist = TMP / "v.txt"; alist = TMP / "a.txt"
-    vlines, alines, durs = [], [], []
+    n = len(items)
+    vsegs, asegs, durs = [], [], []
     for i, seg in enumerate(items):
         vo = AUDIO / f"vo_{i:02d}_{seg['id']}.flac"
-        d = _dur(vo) + PAD
+        lead = OVERLAP if i > 0 else 0.0          # leading silence so the dissolve lands on silence
+        d = _dur(vo) + PAD + lead                  # video & audio segment share this duration
         durs.append(d)
-        # visual stretched to the narration length
+        # ---- visual: Ken Burns on static cards/slates, motion-preserving for live b-roll ----
         vclip = TMP / f"v{i:02d}.mp4"
         kind, src = _resolve_visual(seg["id"])
         if kind == "png":
-            png = TMP / f"slate{i:02d}.png"; _slate_png(src, png); _png_clip(png, vclip, d)
+            png = TMP / f"slate{i:02d}.png"; _slate_png(src, png)
+            _kenburns_clip(png, vclip, d, zoom_in=(i % 2 == 0))
         else:
             _webm_clip(src, vclip, d)
-        vlines.append(f"file '{vclip.name}'")
-        # audio: the voice line + PAD silence, normalized to pcm
+        vsegs.append(vclip)
+        # ---- audio: [lead silence] + voice + [trailing pad], normalized ----
         aclip = TMP / f"a{i:02d}.wav"
-        _run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(vo),
-              "-af", f"apad=pad_dur={PAD},aresample=44100", "-t", f"{d:.2f}",
+        af = (f"adelay={int(lead*1000)}|{int(lead*1000)}," if lead else "") + "apad,aresample=44100"
+        _run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(vo), "-af", af, "-t", f"{d:.2f}",
               "-ac", "2", "-ar", "44100", "-c:a", "pcm_s16le", str(aclip)])
-        alines.append(f"file '{aclip.name}'")
-        print(f"  segment {i:02d} {seg['id']}: {d:.1f}s ({kind})")
-    vlist.write_text("\n".join(vlines)); alist.write_text("\n".join(alines))
-    silent = TMP / "video.mp4"; vo_all = TMP / "vo.wav"
-    _run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(vlist),
-          "-c", "copy", str(silent)])
-    _run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(alist),
-          "-c", "copy", str(vo_all)])
-    total = _dur(vo_all)
+        asegs.append(aclip)
+        print(f"  segment {i:02d} {seg['id']}: {d:.1f}s ({kind}{', KB' if kind=='png' else ''})")
 
-    # transition whoosh at every segment boundary (start of segments 1..N-1)
-    boundaries = [sum(durs[:i]) for i in range(1, len(durs))]
+    total = sum(durs) - (n - 1) * OVERLAP
+
+    # ---- crossfade-dissolve the video segments together ----
+    silent = TMP / "video.mp4"
+    vin = []
+    for v in vsegs:
+        vin += ["-i", str(v)]
+    if n == 1:
+        vfilter, vout = "[0:v]copy[vout]", "vout"
+    else:
+        parts = []; cur = "0:v"; acc = durs[0]
+        for i in range(1, n):
+            off = acc - OVERLAP; lab = f"vx{i}"
+            parts.append(f"[{cur}][{i}:v]xfade=transition=fade:duration={OVERLAP}:offset={off:.3f}[{lab}]")
+            cur = lab; acc += durs[i] - OVERLAP
+        vfilter, vout = ";".join(parts), cur
+    _run(["ffmpeg", "-y", "-loglevel", "error", *vin, "-filter_complex", vfilter,
+          "-map", f"[{vout}]", "-r", "30", "-c:v", "libx264", "-pix_fmt", "yuv420p", str(silent)])
+
+    # ---- crossfade the voice segments on the same timeline ----
+    vo_all = TMP / "vo.wav"
+    ain = []
+    for a in asegs:
+        ain += ["-i", str(a)]
+    if n == 1:
+        afilter = "[0:a]acopy[aout]"; aout = "aout"
+    else:
+        parts = []; cur = "0:a"
+        for i in range(1, n):
+            lab = f"ax{i}"
+            parts.append(f"[{cur}][{i}:a]acrossfade=d={OVERLAP}[{lab}]")
+            cur = lab
+        afilter = ";".join(parts); aout = cur
+    _run(["ffmpeg", "-y", "-loglevel", "error", *ain, "-filter_complex", afilter,
+          "-map", f"[{aout}]", "-ar", "44100", "-ac", "2", "-c:a", "pcm_s16le", str(vo_all)])
+
+    # ---- transition whooshes centred on each dissolve ----
+    boundaries = [sum(durs[:k]) - (k - 1) * OVERLAP - OVERLAP / 2 for k in range(1, n)]
     whoosh = TMP / "whoosh.wav"; sfx = TMP / "sfx.wav"
     _make_whoosh(whoosh); _make_sfx_track(whoosh, boundaries, total, sfx)
 
+    # ---- final mix: fade from/to black, music bed ducked, whooshes, gentle audio fades ----
     out = FINAL / "demo_narrated.mp4"
+    fo = max(0.1, total - 0.8)
+    vfade = f"[0:v]fade=t=in:st=0:d=0.5,fade=t=out:st={fo:.2f}:d=0.8[v]"
     mpath = AUDIO / "music.flac"
     if mpath.exists():
-        # [1]=voice (full level, defines duration) · [2]=music bed (ducked) · [3]=transition whooshes
-        filt = (f"[2:a]volume={MUSIC_VOL},aresample=44100[m];"
-                f"[3:a]volume={SFX_VOL}[s];"
-                f"[1:a][m][s]amix=inputs=3:duration=first:normalize=0[a]")
+        filt = (f"{vfade};[2:a]volume={MUSIC_VOL}[m];[3:a]volume={SFX_VOL}[s];"
+                f"[1:a][m][s]amix=inputs=3:duration=first:normalize=0,"
+                f"afade=t=in:st=0:d=0.4,afade=t=out:st={fo:.2f}:d=0.8[a]")
         _run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(silent), "-i", str(vo_all),
-              "-stream_loop", "-1", "-i", str(mpath), "-i", str(sfx),
-              "-filter_complex", filt, "-map", "0:v:0", "-map", "[a]", "-t", f"{total:.2f}",
-              "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", str(out)])
+              "-stream_loop", "-1", "-i", str(mpath), "-i", str(sfx), "-filter_complex", filt,
+              "-map", "[v]", "-map", "[a]", "-t", f"{total:.2f}",
+              "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", str(out)])
     else:
-        filt = (f"[2:a]volume={SFX_VOL}[s];"
-                f"[1:a][s]amix=inputs=2:duration=first:normalize=0[a]")
+        filt = (f"{vfade};[2:a]volume={SFX_VOL}[s];"
+                f"[1:a][s]amix=inputs=2:duration=first:normalize=0,"
+                f"afade=t=in:st=0:d=0.4,afade=t=out:st={fo:.2f}:d=0.8[a]")
         _run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(silent), "-i", str(vo_all),
-              "-i", str(sfx), "-filter_complex", filt, "-map", "0:v:0", "-map", "[a]",
-              "-t", f"{total:.2f}", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", str(out)])
-    print(f"  assembled narrated cut ({total:.0f}s, music {MUSIC_VOL}, sfx on {len(boundaries)} cuts) -> {out}")
+              "-i", str(sfx), "-filter_complex", filt, "-map", "[v]", "-map", "[a]",
+              "-t", f"{total:.2f}", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac",
+              "-b:a", "192k", str(out)])
+    print(f"  awesome cut: {total:.0f}s, {n} segs, {len(boundaries)} dissolves, KB motion, music {MUSIC_VOL} -> {out}")
 
 
 if __name__ == "__main__":
