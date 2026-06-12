@@ -133,7 +133,3 @@ Files: `agent/receipts.py`, `agent/judge.py` (`judge_with_trace`), `agent/__main
 1. ✅ `ArenaStaking` deployed + verified: [`0x590af780fe1E57AC9B245E14a37d5c3E69F0B8B4`](https://sepolia.mantlescan.xyz/address/0x590af780fe1E57AC9B245E14a37d5c3E69F0B8B4#code).
 2. ✅ `python -m agent.dogfood --arena 0x47f1…0e68 --broadcast` ran — the 6 siblings are registered + scored on-chain (agents #3–#8); the live leaderboard reads them automatically.
 3. ✅ `docs/receipts.json` / `docs/dogfood.json` refreshed from `agent/receipts/` so the static page shows the real 6-agent dogfood result.
-
-## License
-
-All rights reserved for now. This project will be released under an open-source license (MIT) once it is accepted into the Turing Test Hackathon — kept proprietary until then.
