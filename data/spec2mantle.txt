@@ -1,0 +1,1 @@
+NaiveVault looks fine. It is a vault. Consider using a mapping. No specific gas numbers or code provided.

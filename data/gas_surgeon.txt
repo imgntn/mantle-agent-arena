@@ -1,0 +1,6 @@
+Audit of NaiveVault. Score 62/100. Findings:
+- GAS: sumAll() reads depositors.length from storage each iteration (cold SLOAD 2100). Fix: cache length in memory before loop.
+- GAS: clearMany() reads balances[who[i]] twice per iteration and writes total each iteration. Fix: cache local, accumulate removed, subtract once after loop. ~27.85% measured savings (Foundry benchmark).
+- GAS: clearMany(address[] memory) should be calldata.
+- LOW: deposit/sumAll/clearMany are public but only called externally; mark external.
+No reentrancy: deposit has no external call. Recommendations include corrected code and reproducible before/after gas benchmarks.

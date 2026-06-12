@@ -1,0 +1,5 @@
+Audit of NaiveVault. Score 30/100. Findings:
+- HIGH: Reentrancy vulnerability in deposit().
+- HIGH: Repeated storage reads in loops (sumAll, clearMany).
+- MEDIUM: long-form increments; public where external suffices.
+Estimated total gas savings: 7500 bps (75%).
