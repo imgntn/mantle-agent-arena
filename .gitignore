@@ -5,3 +5,8 @@ cache/
 broadcast/
 __pycache__/
 *.pyc
+
+video/raw/
+video/clips/
+video/final/
+video/.tmp/

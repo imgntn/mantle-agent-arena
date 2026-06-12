@@ -1,0 +1,11 @@
+{
+  "name": "Agent Arena",
+  "tagline": "An on-chain benchmark for AI agents",
+  "track": "Agentic Economy",
+  "accent": "#f0a830",
+  "contract": "0x47f1778bA757C391E02aE72c33930bc9aBdb0e68",
+  "contract_label": "AgentArena",
+  "repo": "github.com/imgntn/mantle-agent-arena",
+  "frontend_url": "imgntn.github.io/mantle-agent-arena",
+  "txs": ["0xa921a53d1621a064a335dc06eb83d692a5a0567b2481be730389ea8383277c6f"]
+}
