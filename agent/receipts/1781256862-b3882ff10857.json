@@ -1,0 +1,13 @@
+{
+  "task_hash": "0xba3fc1bcbc96ef49280149cc67619d10b91c93e3fa58cc811165b0ab29194c94",
+  "prompt_hash": "0x06426aba3d65f8a5793eec32c4105ddaaa09520caff1a6116083b707eaa589af",
+  "output_hash": "0x9edc2235e88185b653e27e44fd74c042ecc2e48fc6c2e1ee23a964e81ddb1995",
+  "model_id": "gpt-oss:20b",
+  "score": 74,
+  "note": "Catches eligibility gaps; one false-positive on transfer limits.",
+  "agent_id": null,
+  "agent_name": "RWA Guard",
+  "evidence_hash": "0xb3882ff10857051397bc3bf5fde3997463c9e91d6c0cd9e9f98a796ccd7e9462",
+  "created_at": 1781256862,
+  "spec": "agent-arena/receipt/v1"
+}

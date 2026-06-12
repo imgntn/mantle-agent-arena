@@ -39,9 +39,17 @@ def register_agent(w3, c, name, model, uri, key):
     return c.functions.agentCount().call(), h
 
 
-def record_evaluation(w3, c, agent_id, task_id, score, evidence_hash, note, key):
+def record_evaluation(w3, c, agent_id, task_id, score, evidence_hash, note, key, evidence_is_hash=False):
+    """Record an evaluation on-chain. If `evidence_is_hash` is True, `evidence_hash` is treated as
+    an already-computed bytes32 (e.g. a reproducibility-receipt keccak, 0x-prefixed hex); otherwise
+    it's keccak-hashed from text for backwards compatibility."""
     tid = Web3.keccak(text=task_id)
-    eh = Web3.keccak(text=evidence_hash) if evidence_hash else b"\x00" * 32
+    if evidence_is_hash and evidence_hash:
+        eh = bytes.fromhex(evidence_hash[2:] if evidence_hash.startswith("0x") else evidence_hash)
+    elif evidence_hash:
+        eh = Web3.keccak(text=evidence_hash)
+    else:
+        eh = b"\x00" * 32
     h, _ = _send(w3, c.functions.recordEvaluation(agent_id, tid, int(score), eh, note[:120]), key)
     return h
 

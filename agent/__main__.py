@@ -41,15 +41,37 @@ def cmd_register(args):
 
 def cmd_evaluate(args):
     from . import chain
-    from .judge import judge, model_label
+    from .judge import judge_with_trace, model_label
+    from . import receipts as rcpt
     submission = Path(args.submission).read_text(encoding="utf-8") if args.submission else args.text
     if not submission:
         print("provide --submission <file> or --text", file=sys.stderr); return 2
-    v = judge(args.task, submission)
-    print(f"  judge ({model_label()}): {v.score}/100 — {v.note}")
+    v, full_prompt, raw = judge_with_trace(args.task, submission)
+    model = model_label()
+    print(f"  judge ({model}): {v.score}/100 — {v.note}")
+    # reproducibility receipt: hash(task)+hash(prompt)+hash(output)+model; keccak -> on-chain evidence
+    receipt = rcpt.build_receipt(args.task, full_prompt, raw, model, v.score, v.note,
+                                 agent_id=args.agent_id)
+    path = rcpt.save_receipt(receipt)
+    print(f"  receipt: {receipt['evidence_hash']}  (saved {path.name})")
     w3 = chain.connect(); c = chain.arena(w3, args.arena)
-    h = chain.record_evaluation(w3, c, args.agent_id, args.task, v.score, args.submission or "inline", v.note, _key())
+    h = chain.record_evaluation(w3, c, args.agent_id, args.task, v.score,
+                                receipt["evidence_hash"], v.note, _key(), evidence_is_hash=True)
     print(f"  recorded on-chain: https://sepolia.mantlescan.xyz/tx/{h}")
+    return 0
+
+
+def cmd_receipts(args):
+    from . import receipts as rcpt
+    items = rcpt.load_index()
+    if not items:
+        print("  no receipts yet — run `python -m agent evaluate ...`"); return 0
+    print(f"\n  REPRODUCIBILITY RECEIPTS ({len(items)})\n")
+    for r in items:
+        ok = "OK" if rcpt.verify_receipt(r) else "MISMATCH"
+        print(f"  [{ok}] {r['evidence_hash']}")
+        print(f"        model={r['model_id']} score={r['score']} agent={r.get('agent_name') or r.get('agent_id')}")
+        print(f"        task={r['task_hash'][:18]}… prompt={r['prompt_hash'][:18]}… output={r['output_hash'][:18]}…")
     return 0
 
 
@@ -75,8 +97,9 @@ def main(argv=None):
     sp.add_argument("--task", required=True); sp.add_argument("--submission"); sp.add_argument("--text")
     sp.set_defaults(fn=cmd_evaluate)
     sp = sub.add_parser("leaderboard"); sp.set_defaults(fn=cmd_leaderboard)
+    sp = sub.add_parser("receipts", help="list + verify reproducibility receipts"); sp.set_defaults(fn=cmd_receipts)
     args = p.parse_args(argv)
-    if not args.arena:
+    if args.cmd != "receipts" and not args.arena:
         print("set --arena <address> or ARENA_ADDRESS", file=sys.stderr); return 2
     return args.fn(args)
 

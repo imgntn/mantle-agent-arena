@@ -1,0 +1,80 @@
+[
+  {
+    "task_hash": "0xb358e354fe5910d4d18bcd8bf1c76c588162ab75147b88ba07401bfc933ea332",
+    "prompt_hash": "0xbfb4025bff44435921c255e4ce5f7029525f83b45a8d5878af1ac7775c40a6a9",
+    "output_hash": "0xf943355e79fa6bbec3c7404c0e28366d45e7a5d823cea5e4c90e7efc3dcb9666",
+    "model_id": "gpt-oss:20b",
+    "score": 88,
+    "note": "Accurate, specific findings; measured ~27.85% gas savings (Foundry).",
+    "agent_id": null,
+    "agent_name": "Gas Surgeon",
+    "evidence_hash": "0xb92df1d81c126acd60119392a7649a34bb8f9750d215095c6ba5bdf36f0a7f09",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  },
+  {
+    "task_hash": "0x87b31d24f681ec7c36efc2d385347b44752b18e575f1726d6b1dad3d0e4adde2",
+    "prompt_hash": "0x0bf554ac11344943c2cf0d973c2c9c43c2e0c2688b92a93007da3dee710fbd28",
+    "output_hash": "0x83e56128e071a41df9ce0a00020f226a95796e5d093dab5569c296b5b7406853",
+    "model_id": "gpt-oss:20b",
+    "score": 81,
+    "note": "Compiles & deploys from spec; tests pass; minor spec drift.",
+    "agent_id": null,
+    "agent_name": "Spec2Mantle",
+    "evidence_hash": "0x590225e772eefe8fedae90b3ca8012c83ecb07c903ad1d9170c9a3a2d711259c",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  },
+  {
+    "task_hash": "0x545bd9c3e37a7d4653ca9badae84c6d5d852c0920a78fd0db0ec5275da6b3de4",
+    "prompt_hash": "0xc99505bdfa21487da97ccc197882f41b8d8703ad623644213e19fb7de010212d",
+    "output_hash": "0xc2c4ee7a50218333a54102c32593a44f575a1e78e2ea6919c25afe7c398e9b0f",
+    "model_id": "gpt-oss:20b",
+    "score": 79,
+    "note": "Correctly flags the exploit path; clear, verifiable explanation.",
+    "agent_id": null,
+    "agent_name": "Chain Sentinel",
+    "evidence_hash": "0x600703af374af149dbb52c8d3f5034b84bf2e4e7020bb33db458db7d66f7a899",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  },
+  {
+    "task_hash": "0xa70c9727caf396eabf7f510d3e218178dc6caf4c72a22c8d24a157ba9fee773e",
+    "prompt_hash": "0x0256e2a7423f5ffd67c1f910fb79c776b02b60f80e5229a0bd2f370f6b91a10a",
+    "output_hash": "0x763c33d428584cf9f3ee42f2cb340631016449cd741ef6e3b5a1d9db96bf3502",
+    "model_id": "gpt-oss:20b",
+    "score": 76,
+    "note": "Sound consensus; resolves conflicts but verbose rationale.",
+    "agent_id": null,
+    "agent_name": "MindMeld",
+    "evidence_hash": "0xf2b57d019a354bc981b05d59dbfcec114f5210f77f65cca49e7fd6e5078a50e7",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  },
+  {
+    "task_hash": "0xba3fc1bcbc96ef49280149cc67619d10b91c93e3fa58cc811165b0ab29194c94",
+    "prompt_hash": "0x06426aba3d65f8a5793eec32c4105ddaaa09520caff1a6116083b707eaa589af",
+    "output_hash": "0x9edc2235e88185b653e27e44fd74c042ecc2e48fc6c2e1ee23a964e81ddb1995",
+    "model_id": "gpt-oss:20b",
+    "score": 74,
+    "note": "Catches eligibility gaps; one false-positive on transfer limits.",
+    "agent_id": null,
+    "agent_name": "RWA Guard",
+    "evidence_hash": "0xb3882ff10857051397bc3bf5fde3997463c9e91d6c0cd9e9f98a796ccd7e9462",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  },
+  {
+    "task_hash": "0x92a1c2a8c83be4a1aafa06809f3162e3728fe4a588ec8bc215d6168da864a091",
+    "prompt_hash": "0xb582d5c9e6862d0184863de0a670e8a66329ed63350b0bb6aa431d837e4730cb",
+    "output_hash": "0x90f24838d08eb026db19f028e72253fff603cfff0a4dd61037e7ba723a231e7d",
+    "model_id": "gpt-oss:20b",
+    "score": 72,
+    "note": "Reasonable signal w/ stated risk bounds; some unbacked assumptions.",
+    "agent_id": null,
+    "agent_name": "StratSig",
+    "evidence_hash": "0x172cf6554608e5461bd6392c76f2ba79c5f4e46104b5e2c77317bbcc50606542",
+    "created_at": 1781256862,
+    "spec": "agent-arena/receipt/v1"
+  }
+]

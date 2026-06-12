@@ -1,0 +1,13 @@
+{
+  "task_hash": "0xa70c9727caf396eabf7f510d3e218178dc6caf4c72a22c8d24a157ba9fee773e",
+  "prompt_hash": "0x0256e2a7423f5ffd67c1f910fb79c776b02b60f80e5229a0bd2f370f6b91a10a",
+  "output_hash": "0x763c33d428584cf9f3ee42f2cb340631016449cd741ef6e3b5a1d9db96bf3502",
+  "model_id": "gpt-oss:20b",
+  "score": 76,
+  "note": "Sound consensus; resolves conflicts but verbose rationale.",
+  "agent_id": null,
+  "agent_name": "MindMeld",
+  "evidence_hash": "0xf2b57d019a354bc981b05d59dbfcec114f5210f77f65cca49e7fd6e5078a50e7",
+  "created_at": 1781255578,
+  "spec": "agent-arena/receipt/v1"
+}

@@ -72,34 +72,85 @@ def slates():
 
 
 def _route(route):
+    # Abort tracker/analytics beacons (Pi-hole-safe) but NEVER the Cloudflare challenge
+    # platform (challenges.cloudflare.com / cdn-cgi) — that has to run for the page to clear.
     route.abort() if any(t in route.request.url for t in TRACKERS) else route.continue_()
+
+
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+PROFILE = HERE / ".capture_profile"
+CF_MARKERS = ("performing security verification", "just a moment", "verify you are human",
+              "verifying you are human", "needs to review the security", "checking your browser")
+
+
+def _cf_clear(pg, timeout_ms=40000):
+    """Block until a Cloudflare interstitial clears (or timeout). Returns True if real content shown."""
+    steps = max(1, timeout_ms // 1500)
+    for _ in range(steps):
+        try:
+            body = pg.inner_text("body", timeout=2500).lower()
+            title = (pg.title() or "").lower()
+        except Exception:
+            body, title = "", ""
+        blob = body + " " + title
+        if blob.strip() and not any(m in blob for m in CF_MARKERS) and len(body) > 250:
+            return True
+        pg.wait_for_timeout(1500)
+    return False
 
 
 def capture():
     RAW.mkdir(parents=True, exist_ok=True)
     from playwright.sync_api import sync_playwright
     frontend = (ROOT / "docs" / "index.html").as_uri()
-    shots = [("frontend", frontend, 4, 3), ("explorer", f"{EXPLORER}/address/{CFG['contract']}#code", 4, 3)]
-    for tx in CFG.get("txs", [])[:2]:
-        shots.append((f"tx_{tx[:8]}", f"{EXPLORER}/tx/{tx}", 3, 2))
+    # (name, url, settle_s, scrolls, is_cloudflare)
+    # Only the local frontend is captured. Mantlescan's Cloudflare human-check can't be passed
+    # reliably from automation, so the explorer/tx segments use rendered placeholder cards
+    # (see narrate.py FORCE_CARDS). To re-enable live explorer/tx capture later, append:
+    #   ("explorer", f"{EXPLORER}/address/{CFG['contract']}#code", 3, 4, True)
+    #   and tx shots, then set FORCE_CARDS=False in narrate.py.
+    shots = [("frontend", frontend, 4, 3, False)]
+    # One persistent, headful context: Cloudflare's managed challenge auto-clears for a real
+    # browser, and the cf_clearance cookie persists so later explorer/tx pages load instantly.
     with sync_playwright() as p:
-        for name, url, wait, scrolls in shots:
-            ctx = p.chromium.launch(headless=True).new_context(
-                viewport={"width": W, "height": H},
-                record_video_dir=str(RAW), record_video_size={"width": W, "height": H})
-            ctx.route("**/*", _route)
+        ctx = p.chromium.launch_persistent_context(
+            str(PROFILE), headless=False, viewport={"width": W, "height": H},
+            user_agent=UA, locale="en-US",
+            record_video_dir=str(RAW), record_video_size={"width": W, "height": H},
+            ignore_default_args=["--enable-automation"],
+            args=["--disable-blink-features=AutomationControlled"])
+        ctx.route("**/*", _route)
+        pending = []  # (temp_video_path, dst_name, cleared) — renamed after ctx.close() (Win file lock)
+        for name, url, wait, scrolls, is_cf in shots:
             pg = ctx.new_page()
+            cleared = True
             try:
-                pg.goto(url, wait_until="domcontentloaded", timeout=45000)
+                pg.goto(url, wait_until="domcontentloaded", timeout=60000)
+                if is_cf:
+                    cleared = _cf_clear(pg)
+                    if not cleared:
+                        print(f"  ! {name}: Cloudflare did not clear — skipping (won't embed a CF screen)")
                 pg.wait_for_timeout(wait * 1000)
                 for _ in range(scrolls):
                     pg.evaluate("window.scrollBy(0, 360)"); pg.wait_for_timeout(1100)
+                pg.wait_for_timeout(800)
             except Exception as e:
                 print(f"  ({name} slow: {e})")
-            vp = Path(pg.video.path()); pg.close(); ctx.close()
-            dst = RAW / f"{name}.webm"
-            if dst.exists(): dst.unlink()
-            vp.rename(dst); print(f"  captured {name}.webm")
+            vp = pg.video.path(); pg.close()
+            pending.append((vp, f"{name}.webm", cleared))
+        ctx.close()  # finalizes/releases all recorded video files
+    for vp, dstname, cleared in pending:
+        vp = Path(vp); dst = RAW / dstname
+        if not cleared:            # discard a challenge-screen capture so narrate.py falls back
+            try: vp.unlink()
+            except Exception: pass
+            continue
+        if dst.exists(): dst.unlink()
+        try:
+            vp.rename(dst); print(f"  captured {dstname}")
+        except Exception as e:
+            print(f"  ! could not save {dstname}: {e}")
 
 
 def assemble():

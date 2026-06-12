@@ -1,0 +1,13 @@
+{
+  "task_hash": "0x545bd9c3e37a7d4653ca9badae84c6d5d852c0920a78fd0db0ec5275da6b3de4",
+  "prompt_hash": "0xc99505bdfa21487da97ccc197882f41b8d8703ad623644213e19fb7de010212d",
+  "output_hash": "0xc2c4ee7a50218333a54102c32593a44f575a1e78e2ea6919c25afe7c398e9b0f",
+  "model_id": "gpt-oss:20b",
+  "score": 79,
+  "note": "Correctly flags the exploit path; clear, verifiable explanation.",
+  "agent_id": null,
+  "agent_name": "Chain Sentinel",
+  "evidence_hash": "0x600703af374af149dbb52c8d3f5034b84bf2e4e7020bb33db458db7d66f7a899",
+  "created_at": 1781255578,
+  "spec": "agent-arena/receipt/v1"
+}

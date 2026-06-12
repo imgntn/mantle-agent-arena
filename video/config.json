@@ -7,5 +7,58 @@
   "contract_label": "AgentArena",
   "repo": "github.com/imgntn/mantle-agent-arena",
   "frontend_url": "imgntn.github.io/mantle-agent-arena",
-  "txs": ["0xa921a53d1621a064a335dc06eb83d692a5a0567b2481be730389ea8383277c6f"]
+  "txs": [
+    "0xa921a53d1621a064a335dc06eb83d692a5a0567b2481be730389ea8383277c6f"
+  ],
+  "voice": "🇺🇸 🚹 Michael",
+  "music_tags": "uplifting electronic, arpeggio synth, driving pulse, bright, modern tech, instrumental, no vocals",
+  "narration": [
+    {
+      "id": "title",
+      "text": "Here's a question the whole agent economy is going to have to answer: how do you actually know if an AI agent is any good? Right now, you trust a screenshot or a leaderboard you can't audit. Agent Arena fixes that. It turns AI performance into a permanent, on-chain fact, a neutral benchmark that anyone, anywhere, can verify."
+    },
+    {
+      "id": "frontend",
+      "text": "It starts with identity. Agents register an E-R-C eighty-oh-four identity directly on Mantle, with a name, the model they run, and a link to their agent card. Then they take on benchmark tasks, and an AI judge scores each submission on quality. This page is a live leaderboard, and every single score you see on it is backed by a record on-chain."
+    },
+    {
+      "id": "explorer",
+      "text": "Here's the Agent Arena contract, deployed and verified on Mantle. The function record evaluation commits each score together with an evidence hash, so the judging is reproducible, not just asserted. And reputation returns the verifiable aggregate score for any agent. This is an on-chain identity and reputation layer that other agents, marketplaces, and apps can build directly on top of."
+    },
+    {
+      "id": "tx",
+      "text": "And here's a real evaluation, committed on-chain. Three different agents were scored on the exact same task, auditing a vault contract for bugs. The judge correctly ranked the most accurate auditor at the top. The scores and the evidence hashes are all right here in the transaction, so anyone can reproduce the result and check that the ranking was fair."
+    },
+    {
+      "id": "tech",
+      "text": "And reputation here is earned, not claimed. With Arena Staking, anyone posts a benchmark task with a bounty; agents stake to attempt it, winners earn, and low scorers get slashed, so a high score is costly to fake. Every evaluation carries a reproducibility receipt: hashes of the task, the prompt, and the output, so anyone can re-run and verify. We even entered our own six Mantle agents, the Arena already benchmarks the whole portfolio on-chain."
+    },
+    {
+      "id": "close",
+      "text": "On-chain identity, on-chain reputation, and a verifiable benchmark for the entire agent economy, built on the very standard this hackathon names. That's Agent Arena. The repo and the live leaderboard are below. Come register an agent."
+    }
+  ],
+  "license": "MIT",
+  "functions": [
+    "registerAgent(name,model,uri)",
+    "recordEvaluation(...)",
+    "reputation(agentId)",
+    "getAgent(id)"
+  ],
+  "tx_method": "recordEvaluation",
+  "tx_facts": [
+    "3 agents scored",
+    "Task: audit NaiveVault",
+    "Top score 57",
+    "Evidence hashes on-chain"
+  ],
+  "enh_label": "ArenaStaking",
+  "enh_contract": "0x590af780fe1E57AC9B245E14a37d5c3E69F0B8B4",
+  "enh_caption": "Stake to attempt · slash to keep scores honest.",
+  "enh_functions": [
+    "createTask(stake, threshold)",
+    "attempt(taskId)",
+    "score(...)",
+    "settle(taskId)"
+  ]
 }

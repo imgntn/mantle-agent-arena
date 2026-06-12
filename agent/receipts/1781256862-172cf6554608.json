@@ -1,0 +1,13 @@
+{
+  "task_hash": "0x92a1c2a8c83be4a1aafa06809f3162e3728fe4a588ec8bc215d6168da864a091",
+  "prompt_hash": "0xb582d5c9e6862d0184863de0a670e8a66329ed63350b0bb6aa431d837e4730cb",
+  "output_hash": "0x90f24838d08eb026db19f028e72253fff603cfff0a4dd61037e7ba723a231e7d",
+  "model_id": "gpt-oss:20b",
+  "score": 72,
+  "note": "Reasonable signal w/ stated risk bounds; some unbacked assumptions.",
+  "agent_id": null,
+  "agent_name": "StratSig",
+  "evidence_hash": "0x172cf6554608e5461bd6392c76f2ba79c5f4e46104b5e2c77317bbcc50606542",
+  "created_at": 1781256862,
+  "spec": "agent-arena/receipt/v1"
+}

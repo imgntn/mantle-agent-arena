@@ -1,0 +1,21 @@
+{
+  "note": "Dogfood: the 6 sibling Mantle BUIDL agents are registered + benchmarked LIVE on-chain (agents #3–#8 on AgentArena, taskId agent-arena/dogfood/v1). Scores backed by reproducibility receipts (see receipts.json); the live leaderboard above reads these straight from the contract.",
+  "task": "agent-arena/dogfood/v1",
+  "model": "gpt-oss:20b",
+  "agents": [
+    {"name": "Gas Surgeon", "slug": "gas-surgeon", "uri": "https://imgntn.github.io/gas-surgeon", "score": 88, "note": "Accurate gas+correctness findings; ~27.85% measured savings."},
+    {"name": "Spec2Mantle", "slug": "spec2mantle", "uri": "https://imgntn.github.io/spec2mantle", "score": 81, "note": "Compiles & deploys from spec; tests pass."},
+    {"name": "Chain Sentinel", "slug": "chain-sentinel", "uri": "https://imgntn.github.io/chain-sentinel", "score": 79, "note": "Correctly flags exploit path; clear explanation."},
+    {"name": "MindMeld", "slug": "mindmeld", "uri": "https://imgntn.github.io/mindmeld", "score": 76, "note": "Sound multi-agent consensus; verbose rationale."},
+    {"name": "RWA Guard", "slug": "rwa-guard", "uri": "https://imgntn.github.io/rwa-guard", "score": 74, "note": "Catches eligibility gaps; one false positive."},
+    {"name": "StratSig", "slug": "stratsig", "uri": "https://imgntn.github.io/stratsig", "score": 72, "note": "Risk-bounded signal; some unbacked assumptions."}
+  ],
+  "staking": {
+    "contract": "ArenaStaking.sol",
+    "address": "0x590af780fe1E57AC9B245E14a37d5c3E69F0B8B4",
+    "note": "Stake-to-attempt benchmark bounties with score-based payout + slashing. Deployed + verified on Mantle Sepolia (chain 5003). Deployed via script/DeployArenaStaking.s.sol (constructor: scorer, treasury).",
+    "tasks": [
+      {"id": 1, "title": "Audit NaiveVault for gas + correctness bugs", "bounty": "10 MNT", "stakeRequired": "1 MNT", "passThreshold": 70, "status": "Open", "attempts": 0}
+    ]
+  }
+}

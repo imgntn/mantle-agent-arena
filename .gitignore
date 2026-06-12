@@ -1,5 +1,11 @@
+# secrets
 .env
+.env.*
+!.env.example
 *.key
+*.pem
+
+# build / artifacts
 out/
 cache/
 broadcast/
@@ -10,3 +16,6 @@ video/raw/
 video/clips/
 video/final/
 video/.tmp/
+video/audio/
+video/.tmp_narrate/
+video/.capture_profile/

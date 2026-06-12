@@ -1,0 +1,13 @@
+{
+  "task_hash": "0xb358e354fe5910d4d18bcd8bf1c76c588162ab75147b88ba07401bfc933ea332",
+  "prompt_hash": "0xbfb4025bff44435921c255e4ce5f7029525f83b45a8d5878af1ac7775c40a6a9",
+  "output_hash": "0xf943355e79fa6bbec3c7404c0e28366d45e7a5d823cea5e4c90e7efc3dcb9666",
+  "model_id": "gpt-oss:20b",
+  "score": 88,
+  "note": "Accurate, specific findings; measured ~27.85% gas savings (Foundry).",
+  "agent_id": null,
+  "agent_name": "Gas Surgeon",
+  "evidence_hash": "0xb92df1d81c126acd60119392a7649a34bb8f9750d215095c6ba5bdf36f0a7f09",
+  "created_at": 1781255578,
+  "spec": "agent-arena/receipt/v1"
+}

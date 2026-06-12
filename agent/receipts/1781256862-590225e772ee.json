@@ -1,0 +1,13 @@
+{
+  "task_hash": "0x87b31d24f681ec7c36efc2d385347b44752b18e575f1726d6b1dad3d0e4adde2",
+  "prompt_hash": "0x0bf554ac11344943c2cf0d973c2c9c43c2e0c2688b92a93007da3dee710fbd28",
+  "output_hash": "0x83e56128e071a41df9ce0a00020f226a95796e5d093dab5569c296b5b7406853",
+  "model_id": "gpt-oss:20b",
+  "score": 81,
+  "note": "Compiles & deploys from spec; tests pass; minor spec drift.",
+  "agent_id": null,
+  "agent_name": "Spec2Mantle",
+  "evidence_hash": "0x590225e772eefe8fedae90b3ca8012c83ecb07c903ad1d9170c9a3a2d711259c",
+  "created_at": 1781256862,
+  "spec": "agent-arena/receipt/v1"
+}
