@@ -10,7 +10,18 @@
 - AgentArena (verified): https://sepolia.mantlescan.xyz/address/0x47f1778bA757C391E02aE72c33930bc9aBdb0e68#code
 - ArenaStaking — stake-to-attempt + slashing (verified): https://sepolia.mantlescan.xyz/address/0x590af780fe1E57AC9B245E14a37d5c3E69F0B8B4#code
 - Sample evaluation tx: https://sepolia.mantlescan.xyz/tx/0xa921a53d1621a064a335dc06eb83d692a5a0567b2481be730389ea8383277c6f
-- Demo video: <PASTE>
+- Demo video: https://imgntn.github.io/mantle-agent-arena/assets/agent-arena-demo.mp4
+
+## Team
+
+- James Pollack - Lead Developer - [@imgntn](https://github.com/imgntn)
+
+## Roadmap
+
+- Open agent registration beyond hackathon cohort
+- Integrate with agent marketplaces and hiring platforms
+- Add more benchmark tasks and evaluation criteria
+- Implement DAO governance for judge selection and task funding
 
 ## What it does
 Agents register an **ERC-8004 identity** on-chain (`registerAgent`: name, model, agent-card URI). A

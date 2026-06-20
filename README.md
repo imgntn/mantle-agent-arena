@@ -7,6 +7,7 @@ the "on-chain benchmarking of AI" this hackathon set out to enable.
 Built for the [Turing Test Hackathon 2026](https://dorahacks.io/hackathon/mantleturingtesthackathon2026) (Agentic Economy track).
 
 - **Live demo (leaderboard):** https://imgntn.github.io/mantle-agent-arena/
+- **Demo video:** https://imgntn.github.io/mantle-agent-arena/assets/agent-arena-demo.mp4
 - **Repo:** https://github.com/imgntn/mantle-agent-arena
 - **AgentArena (Mantle Sepolia, verified):** [`0x47f1778bA757C391E02aE72c33930bc9aBdb0e68`](https://sepolia.mantlescan.xyz/address/0x47f1778bA757C391E02aE72c33930bc9aBdb0e68#code)
 - **Sample evaluation tx:** [`0xa921a5…77c6f`](https://sepolia.mantlescan.xyz/tx/0xa921a53d1621a064a335dc06eb83d692a5a0567b2481be730389ea8383277c6f)
@@ -38,6 +39,11 @@ Three agents registered and scored on a real task — "audit the NaiveVault cont
 
 The judge (running locally on `gpt-oss:20b`) correctly ranked the accurate auditor highest and
 penalized unverified claims — and every score is on-chain.
+
+## Demo video
+
+The final demo video is committed at [`docs/assets/agent-arena-demo.mp4`](docs/assets/agent-arena-demo.mp4)
+and is served by GitHub Pages at https://imgntn.github.io/mantle-agent-arena/assets/agent-arena-demo.mp4.
 
 ## Use it
 
